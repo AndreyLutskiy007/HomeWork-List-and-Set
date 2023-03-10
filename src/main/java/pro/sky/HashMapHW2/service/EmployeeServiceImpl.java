@@ -5,34 +5,34 @@ import pro.sky.HashMapHW2.exception.EmployeeAlreadyAddedException;
 import pro.sky.HashMapHW2.exception.EmployeeNotFoundException;
 import pro.sky.HashMapHW2.person.Employee;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
-    public EmployeeServiceImpl(List<Employee> employeeList) {
-        this.employeeList = new ArrayList<>();
+    private final Map<String, Employee> employees;
+    public EmployeeServiceImpl() {
+
+        this.employees = new HashMap<>();
     }
 
-    private final List<Employee> employeeList;
+
 
     @Override
 
     public Employee add(String lastName, String firstName) {
         Employee employee = new Employee(lastName, firstName);
-        if (employeeList.contains(employee)) {
+        if (employees.containsKey(employee.getFullName())) {
             throw new EmployeeAlreadyAddedException("уже есть такой сотрудник");
         }
-        employeeList.add(employee);
+        employees.put(employee.getFullName(), employee);
         return employee;
     }
 
     @Override
     public Employee find(String lastName, String firstName) {
         Employee employee = new Employee(lastName, firstName);
-        if (employeeList.contains(employee)) {
-            return employee;
+        if (employees.containsKey(employee.getFullName())) {
+            return employees.remove(employee.getFullName());
         }
 
         throw new EmployeeNotFoundException("Сотрудник не найден");
@@ -42,9 +42,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee remove(String lastName, String firstName) {
         Employee employee = new Employee(lastName, firstName);
-        if (employeeList.contains(employee)) {
-            employeeList.remove(employee);
+        if (employees.containsKey(employee.getFullName())) {
+             employees.remove(employee.getFullName());
             return employee;
+
         }
         throw new  EmployeeNotFoundException("сотрудник не найден.");
 
@@ -52,6 +53,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Collection<Employee> findAllPerson() {
-        return employeeList;
+        return Collections.unmodifiableCollection(employees.values());
     }
 }
